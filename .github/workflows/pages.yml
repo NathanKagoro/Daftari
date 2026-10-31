@@ -1,0 +1,95 @@
+# Builds Daftari and publishes it on GitHub Pages.
+#
+# Daftari is an edition of Kitabu's code (NathanKagoro/Kitabu): one codebase,
+# so both apps share the same maths. This workflow checks out Kitabu and
+# builds it with NEXT_PUBLIC_EDITION=daftari.
+#
+# Repository variables (Settings > Secrets and variables > Actions > Variables):
+#   KITABU_REF         branch or tag of Kitabu to build (unset: main)
+#   SUPABASE_URL       the same project Kitabu uses (unset: demo mode, data stays on the phone)
+#   SUPABASE_ANON_KEY  the project's anon/public key (safe to publish; RLS protects the data)
+#   SUPPORT_WHATSAPP   your number for the "contact us" buttons, e.g. 0712345678
+#
+# The service-role key is never needed here and must never be added.
+
+name: Deploy Daftari to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Picks up Kitabu's changes every night (03:17 in Dar es Salaam).
+  schedule:
+    - cron: '17 0 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kitabu
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: NathanKagoro/Kitabu
+          ref: ${{ vars.KITABU_REF || 'main' }}
+          path: kitabu
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: kitabu/package-lock.json
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - run: npm ci
+
+      - name: Check
+        run: |
+          npm run typecheck
+          npm run lint
+          npm run i18n:check
+          npm test
+
+      - name: Daftari's icons
+        run: node scripts/make-icons.mjs
+        env:
+          NEXT_PUBLIC_EDITION: daftari
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_EDITION: daftari
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          NEXT_PUBLIC_SITE_URL: ${{ steps.pages.outputs.origin }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPPORT_WHATSAPP: ${{ vars.SUPPORT_WHATSAPP }}
+
+      # Without this, GitHub Pages hides the _next/ folder (Jekyll skips "_" paths).
+      - run: touch out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: kitabu/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,35 +1,32 @@
 # Daftari
 
-A sales book for very small shops: one owner, one phone, a short list of products. Swahili and English. It works offline and installs on the phone like an app.
+A sales book for very small shops: one owner, one phone, a short list of products. Swahili and English, light or dark, works offline and installs on the phone like an app.
 
-Live: https://daftari-book.netlify.app (to be replaced by Daftari version 2).
+**Demo:** https://nathankagoro.github.io/Daftari/demo/ (a sample shop, Duka la Mama Asha; data stays in your browser).
 
-## How it works
+## Where the code is
 
-- **Data lives on the phone** (IndexedDB, falling back to localStorage) and syncs both ways with the owner's own **Google Sheet** through a Google Apps Script web app, whenever there is internet.
-- **Each install is private to its sheet.** `config.js` leaves `syncUrl` empty, so a new install asks for its own sync link before it opens. The sync link works like a password: anyone who has it can read and write that sheet, so share it only with the owner.
-- **Setup per shop** takes about 10 minutes: a blank Google Sheet with the sync script, and its web app link given to the owner.
+Daftari is an **edition of Kitabu's code** ([NathanKagoro/Kitabu](https://github.com/NathanKagoro/Kitabu)): the same app built with `NEXT_PUBLIC_EDITION=daftari`. Both apps work out profit, stock, money owed and the cash in the tin with the same code, so a number means the same thing in each. This repo holds the build that publishes Daftari to GitHub Pages (`.github/workflows/pages.yml`); it rebuilds on every push here, nightly, and on demand.
 
-Screens: Overview (profit, sales, items sold, money owed, how profit is worked out, where the profit goes, chart, by product), Sales, Costs (purchases and losses), Customers (with regulars who are due), More (products, profit split, Google Sheet link, backup, tutorial).
+What the Daftari edition changes (see `lib/edition` in Kitabu):
 
-## Files
+| | Daftari | Kitabu |
+|---|---|---|
+| Opens on | **Leo**: the profit for the period and one "Andika mauzo" button | The till |
+| Tabs | Leo, Mauzo, Manunuzi, Wateja, Zaidi | Mauzo, Manunuzi, Madeni, Hesabu, Zaidi |
+| Own features | Where the profit goes (tithe, reinvest, personal, savings), regulars due or late | Stock checks with shortfall in shillings, staff, invoices, TRA receipts |
+| Left out | Staff, invoices, suppliers, VAT, TRA receipts, product codes, daily prices | — |
+| Colour | Notebook blue | Green |
 
-| File | What it is |
-|---|---|
-| `index.html` | The page |
-| `app.js` | The whole app: storage, sync, maths, screens, tutorial |
-| `styles.css` | Styles |
-| `config.js` | Per-copy settings (sync link left empty on purpose) |
-| `sw.js`, `manifest.webmanifest`, `icons/` | Offline and install-as-app |
-| `fonts/` | Anton and Barlow, served locally |
-| `_headers` | Netlify headers |
+## How a shop gets Daftari
 
-The Google Apps Script that sits behind each sheet is not in this repo yet.
+The same way as Kitabu: you create the shop in the admin screen, choosing **Daftari** as the product, and send the owner their setup code. One shop per owner. Each shop shows in the console with its product.
 
-## Run it
+## Version 1
 
-Serve the folder with any static server, e.g. `python3 -m http.server`, and open http://localhost:8000.
+The first Daftari (one HTML page and a Google Sheet per shop) is on the [`v1`](../../tree/v1) branch, and still live at https://daftari-book.netlify.app for shops that use it. The very first version, "Big Rabbit Book", is on the `daftari` branch of [finance-trackers-legacy](https://github.com/NathanKagoro/finance-trackers-legacy/tree/daftari).
 
-## History
+## Setup
 
-The first version, "Big Rabbit Book", is on the `daftari` branch of [finance-trackers-legacy](https://github.com/NathanKagoro/finance-trackers-legacy/tree/daftari). Daftari version 2 will move onto Kitabu's code, keeping the same way of working: one shop per owner, set up by hand, with the owner's Google Sheet as their copy.
+1. **Settings → Pages → Source: GitHub Actions.**
+2. Optional repository variables (Settings → Secrets and variables → Actions → Variables): `SUPABASE_URL`, `SUPABASE_ANON_KEY` (the same project as Kitabu), `SUPPORT_WHATSAPP`, `KITABU_REF`. Without Supabase it runs as a demo with data on the phone.
