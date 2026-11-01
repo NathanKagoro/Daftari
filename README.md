@@ -12,11 +12,11 @@ What the Daftari edition changes (see `lib/edition` in Kitabu):
 
 | | Daftari | Kitabu |
 |---|---|---|
-| Opens on | **Leo**: the profit for the period and one "Andika mauzo" button | The till |
-| Tabs | Leo, Mauzo, Manunuzi, Wateja, Zaidi | Mauzo, Manunuzi, Madeni, Hesabu, Zaidi |
+| Opens on | **Leo**: the profit for the period and one "Andika mauzo" button | **Muhtasari**: a business dashboard; the till is one tap away |
+| Tabs | Leo, Mauzo, Manunuzi, Wateja, Zaidi | Muhtasari, Mauzo, Manunuzi, Madeni, Zaidi |
 | Own features | Where the profit goes (tithe, reinvest, personal, savings), regulars due or late | Stock checks with shortfall in shillings, staff, invoices, TRA receipts |
 | Left out | Staff, invoices, suppliers, VAT, TRA receipts, product codes, daily prices | — |
-| Colour | Notebook blue | Green |
+| Look | The first Daftari's: black band, red, gold figures, condensed type | Office-style: petrol bar, white panels, phone's own font |
 
 ## How a shop gets Daftari
 
